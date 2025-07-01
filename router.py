@@ -1,5 +1,5 @@
-from gcp_paths import *
-from gcp_utils import get_bucket, get_blobs, move_blob, parkings_current_info, delete_previous_version
+from gcp.paths import *
+from gcp.utils import get_bucket, get_blobs, move_blob, parkings_current_info, delete_previous_version
 
 
 def main():
