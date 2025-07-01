@@ -3,13 +3,11 @@ from current_month import date, year
 
 PROJECT_ID = 'bigdata-fase2'
 
-# BigQuery
 DATASET             = f'{PROJECT_ID}.parkings_datamart'
 TABLE_EVENTS        = f'{DATASET}.events'
 TABLE_PARKINGS      = f'{DATASET}.parkings'
 TABLE_PARKINGS_STATES = f'{DATASET}.parkings_states'
 
-# Cloud Storage
 BUCKET_NAME        =  'sagulpa-datalake'
 PATH_DATALAKE_DOCS =  'parkings-off_street/documents'
 PATH_INBOX         = f'parkings-off_street/inbox/{date}'
@@ -28,7 +26,6 @@ path_transparencia       = f'{PATH_OPEN_DATA}/transparency'                     
 
 
 def get_path(doc_type, parking):
-    """Obtiene el path del archivo correspondiente a un aparcamiento y tipo de documento."""
     parkings_alias = {
         'Elder':           'elder',
         'Mata':            'mata',
@@ -39,7 +36,6 @@ def get_path(doc_type, parking):
         'Sanapú':          'sanapu',
         'Vegueta':         'vegueta'
     }
-
 
     parking_norm = parkings_alias.get(parking)
 
