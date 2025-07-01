@@ -1,9 +1,8 @@
-from gcp_paths import path_ocupacion_ld as ss_ld, path_ocupacion_lv as ss_lv, path_ocupacion_sd as ss_sd
-from gcp_utils import read, parkings_current_info
+from gcp.paths import path_ocupacion_ld as ss_ld, path_ocupacion_lv as ss_lv, path_ocupacion_sd as ss_sd
+from gcp.utils import read, parkings_current_info
 
 
 def main():
-
     events = []
 
     df_ld = read(ss_ld, 'csv')
