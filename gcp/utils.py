@@ -1,4 +1,4 @@
-from gcp_paths import BUCKET_NAME, PATH_INBOX, TABLE_EVENTS, TABLE_PARKINGS, TABLE_PARKINGS_STATES
+from gcp.paths import BUCKET_NAME, PATH_INBOX, TABLE_EVENTS, TABLE_PARKINGS, TABLE_PARKINGS_STATES
 from google.cloud import storage, bigquery
 from current_month import date, year, n_month_int, date_to_delete
 from PyPDF2 import PdfReader
