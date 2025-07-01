@@ -1,8 +1,8 @@
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
-from gcp_paths import get_path, path_transparencia
-from gcp_utils import read, upload_files_to_gcs, parkings_current_info
+from gcp.paths import get_path, path_transparencia
+from gcp.utils import read, upload_files_to_gcs, parkings_current_info
 
 
 def main():
@@ -50,13 +50,13 @@ def clean_abonados(df):
 
     prev_mt   = df['MovementType'].shift(1)
     prev_usr  = df['UserNo'].shift(1)
-    # Filtrar salidas huérfanas y transacciones
+
     mask_keep = ~((df['MovementType'] == 4) & (df['UserNo'] != prev_usr))
     df = df.loc[mask_keep & (df['MovementType'] != 1)].reset_index(drop=True)
 
     prev_mt   = df['MovementType'].shift(1)
     prev_usr  = df['UserNo'].shift(1)
-    # Entradas válidas
+
     valid     = (df['MovementType'] == 4) & (prev_mt == 0) & (df['UserNo'] == prev_usr)
     df['Entrada'] = pd.NaT
     df.loc[valid, 'Entrada'] = df['Time'].shift(1)
@@ -69,7 +69,7 @@ def clean_abonados(df):
 def build_records(df, gid, parking, tipo):
     lbl = 'SAN BERNARDO' if parking == 'SB' else parking.upper()
     ent = pd.DataFrame({
-        'Time': df.iloc[:, 1],             # Entrada o PaidFrom
+        'Time': df.iloc[:, 1],
         'MovementTypeDesig': 'ENTRADA',
         'TIPO': tipo
     })
@@ -88,16 +88,13 @@ def create_transparencia(records, output_path_gcs):
     local_path = '/tmp/temp_transparencia.xlsx'
     web_path = '/tmp/temp_transparencia_WEB.xlsx'
 
-    # Mes de estudio
     m = records['Time'].dt.month.value_counts().idxmax()
     temp = records.loc[records['Time'].dt.month.eq(m)].sort_values('Time')
     temp.to_excel(local_path, index=False)
 
-    # --- aquí sólo un load_workbook y un solo save para ambas versiones ---
     wb     = load_workbook(local_path, data_only=True)
     sheet  = wb.active
 
-    # Predefinir estilos
     hdr_f = Font(bold=True, color="002060", size=11, name="Rubik")
     hdr_F = PatternFill(start_color="ddebf7", end_color="ddebf7", fill_type="solid")
     spc_f = Font(bold=True, color="ffff00", size=11, name="Rubik")
@@ -105,10 +102,8 @@ def create_transparencia(records, output_path_gcs):
     bd_f  = Font(size=11, name="Rubik")
     al    = Alignment(horizontal="center", vertical="center")
 
-    # Índice de columna Time
     time_idx = next(c.col_idx for c in sheet[1] if c.value == 'Time')
 
-    # Pase único de estilizado y formato fecha
     for r in sheet.iter_rows(min_row=1, max_row=sheet.max_row,
                              min_col=1, max_col=sheet.max_column):
         for cell in r:
@@ -123,18 +118,15 @@ def create_transparencia(records, output_path_gcs):
                     cell.number_format = 'DD/MM/YYYY HH:MM'
             cell.alignment = al
 
-    # Anchos de columnas
     for col, w in (('A',20),('B',25),('C',25),('D',20),('E',20)): sheet.column_dimensions[col].width = w
 
-    # Guardar versión normal
     wb.save(local_path)
-    # Borrar cols 3 y 4, ajustar anchos y guardar versión WEB
+
     sheet.delete_cols(3, 2)
     for col, w in (('A',20),('B',25),('C',20)):
         sheet.column_dimensions[col].width = w
     wb.save(web_path)
 
-    # Subir ambos archivos a GCS
     upload_files_to_gcs({
         output_path_gcs: local_path,
         output_path_gcs.replace('.xlsx', '_WEB.xlsx'): web_path
