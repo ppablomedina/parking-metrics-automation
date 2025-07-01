@@ -1,8 +1,3 @@
-¡Excelente! Aquí tienes un **README.md** completo, en inglés, perfectamente adaptado a **tu proyecto real** (según tus archivos y arquitectura). Está pensado para publicarse en GitHub y para que cualquier lector entienda qué hace tu ETL, cómo está organizado y cómo se ejecuta. Puedes usarlo directamente o adaptarlo a tu gusto:
-
----
-
-```markdown
 # parking-metrics-automation
 
 🚗 **Parking Metrics Automation** is a cloud-based ETL pipeline designed to automate the extraction, transformation, and loading of operational and financial indicators for rotation parking facilities managed by Sagulpa. This project processes diverse documents and datasets stored in Google Cloud Storage, transforming them into consolidated metrics and KPIs loaded into BigQuery for business analytics and reporting.
