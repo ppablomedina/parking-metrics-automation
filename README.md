@@ -193,6 +193,3 @@ University of Las Palmas de Gran Canaria
 
 *This repository is part of the Bachelor’s Thesis titled:
 “Design and Implementation of a Big Data Architecture in the Cloud for the Processing of Management Indicators of Rotation Parking Lots at Sagulpa.”*
-
-```
-
