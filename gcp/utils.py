@@ -18,7 +18,6 @@ def read(blob_path, type, sheet_name=None):
     elif type == 'pdf':          return PdfReader(io.BytesIO(data))
 
 def upload_files_to_gcs(files_map):
-    """Sube archivos a Google Cloud Storage."""
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
 
@@ -26,13 +25,11 @@ def upload_files_to_gcs(files_map):
         bucket.blob(blob_path).upload_from_filename(local_path)
 
 def move_blob(bucket, from_inbox, to_datalake):
-    """Copia y borra un archivo en GCS (simula un rename)."""
     blob = bucket.blob(from_inbox)
     bucket.copy_blob(blob, bucket, to_datalake)
     blob.delete()
 
 def delete_previous_version(bucket, path, yearly=False):
-    """Elimina la versión del mes anterior del archivo (si existe)."""
     prev_path = path.replace(date, date_to_delete)
     prev_blob = bucket.blob(prev_path)
 
