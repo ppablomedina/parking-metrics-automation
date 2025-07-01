@@ -1,10 +1,9 @@
 import pandas as pd
-from gcp_paths import get_path
-from gcp_utils import read, parkings_current_info
+from gcp.paths import get_path
+from gcp.utils import read, parkings_current_info
 
 
 def main():
-
     events = []
 
     for parking_name, [parking_id, _, _] in parkings_current_info.items():
@@ -30,17 +29,7 @@ def main():
     return events
 
 def get_indices_de_secciones(documnet_lines, titulo, subtitulo, hasta=None, es_para_salidas=False):
-    """
-    documnet_lines: todas las líneas del informe
-    titulo: título de la sección
-    subtitulo: subtítulo de la sección
-    hasta: lista de palabras que detienen la búsqueda
-    es_para_salidas: si es para obtener las salidas, no pone total ni todos al final, por lo que cuando pongan esos valores acaba
-
-    """
-
     lines = []
-
     i_init = None
 
     for i in range(len(documnet_lines)):
@@ -69,7 +58,6 @@ def get_indices_de_secciones(documnet_lines, titulo, subtitulo, hasta=None, es_p
     return lines
 
 def get_informe_indices(lineas):
-
     lines = get_indices_de_secciones(lineas, 'Informe de índices: To', 'Circulación con', es_para_salidas=True)
 
     ticket_aparc_limitado = 0
@@ -90,7 +78,6 @@ def get_informe_indices(lineas):
     return ticket_por_extravio, ticket_aparc_limitado, ta_perm, ta_perm_renov, ab_perm, total
 
 def get_informe_ventas(lineas, parking):
-    
     lines = get_indices_de_secciones(lineas, 'Informe de Ventas: To', 'Artículos')
     recaudacion_tickets_rotacion = 0
 
@@ -112,7 +99,6 @@ def get_informe_ventas(lineas, parking):
     return recaudacion_tickets_rotacion, total
 
 def get_informe_aperturas(lineas):
-
     document_lines = get_indices_de_secciones(lineas, 'Informe de índices: To', 'Nombre', ['Circulación con'])
 
     aperturas = {
@@ -130,7 +116,7 @@ def get_informe_aperturas(lineas):
     for line in document_lines:
         for key, nombre in aperturas.items():
             if key in line:
-                ocasiones = encontrar_el_numero(line)
+                ocasiones = find_number(line)
                 data.append({'Nombre': nombre, 'Ocasiones': ocasiones})
                 break
     
@@ -148,22 +134,13 @@ def get_informe_aperturas(lineas):
     ]
 
 def get_recaudacion_y_operaciones(lineas, parking):
-
-    """                                       RECAUDACIÓN                                       """
     transacciones_con_importe = str_to_float(lineas[2].split(' ')[-2])
-
     recaudacion_tickets_rotacion, total_ventas = get_informe_ventas(lineas, parking) 
-
     recaudacion_r = transacciones_con_importe + recaudacion_tickets_rotacion
-    
     recaudacion_a = total_ventas - recaudacion_tickets_rotacion
 
-    """                                       OPERACIONES                                       """
-
     _, _, ta_perm, ta_perm_renov, ab_perm, total = get_informe_indices(lineas)
-
     operaciones_a = ta_perm + ta_perm_renov + ab_perm
-    
     operaciones_r = total - operaciones_a
 
     return recaudacion_r, recaudacion_a, operaciones_r, operaciones_a
@@ -180,7 +157,7 @@ def get_lines(path):
 def str_to_float(txt):
     return float(txt.replace('.', '').replace(',', '.'))
 
-def encontrar_el_numero(line):
+def find_number(line):
     line = line.split(' ')
     for i in range(len(line)):
         if line[i].isdigit():
