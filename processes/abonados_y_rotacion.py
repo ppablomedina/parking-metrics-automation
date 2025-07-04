@@ -7,21 +7,21 @@ from gcp.utils import read, upload_files_to_gcs, parkings_current_info
 
 def main():
     events = []
-    registros = []
+    records = []
 
     for parking_name, [parking_id, _, _] in parkings_current_info.items():
         df_a, h_a = get_data(parking_name, 1, clean_abonados)
         df_r, h_r = get_data(parking_name, 2, clean_rotacion)
 
-        registros.append(build_records(df_a, parking_id, parking_name, 'ABONADO'))
-        registros.append(build_records(df_r, parking_id, parking_name, 'ROTACIÓN'))
+        records.append(build_records(df_a, parking_id, parking_name, 'ABONADO'))
+        records.append(build_records(df_r, parking_id, parking_name, 'ROTACIÓN'))
 
         events += [
             [parking_id, {'Horas Abonados': h_a}],
             [parking_id, {'Horas Rotación': h_r}],
         ]
 
-    all_rec = pd.concat(registros, ignore_index=True)
+    all_rec = pd.concat(records, ignore_index=True)
     create_transparencia(all_rec, path_transparencia)
     
     return events
